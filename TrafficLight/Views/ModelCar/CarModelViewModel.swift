@@ -13,7 +13,12 @@ class CarModelViewModel: ObservableObject {
     // MARK: - Properties
     @Published var carModel = ""
     @Published var shouldShowError = false
-    @Published var pushTrafficLightView = false
+    
+    private unowned let coordinator: TrafficLightCoordinatorViewModel
+    
+    init(coordinator: TrafficLightCoordinatorViewModel) {
+        self.coordinator = coordinator
+    }
     
 }
 
@@ -26,7 +31,7 @@ extension CarModelViewModel {
             shouldShowError = true
         } else {
             shouldShowError = false
-            pushTrafficLightView = true
+            coordinator.openTrafficLight(carModel: carModel)
         }
     }
     

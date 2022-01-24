@@ -9,9 +9,11 @@ import SwiftUI
 
 struct TrafficLightView: View {
     
-    let carModel: String
+    @StateObject private var viewModel: TrafficLightViewModel
     
-    @StateObject private var viewModel = TrafficLightViewModel()
+    init(viewModel: TrafficLightViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         VStack(spacing: 32) {
@@ -21,7 +23,7 @@ struct TrafficLightView: View {
             
             iterateButton
         }
-        .navigationTitle(carModel)
+        .navigationTitle(viewModel.carModel)
         .onAppear {
             viewModel.fetchData()
         }
@@ -61,6 +63,8 @@ extension TrafficLightView {
 
 struct TrafficLightView_Previews: PreviewProvider {
     static var previews: some View {
-        TrafficLightView(carModel: "My super car model")
+        let coordinatorViewModel = TrafficLightCoordinatorViewModel()
+        let viewModel = TrafficLightViewModel(coordinator: coordinatorViewModel, carModel: "A car model")
+        TrafficLightView(viewModel: viewModel)
     }
 }

@@ -15,8 +15,15 @@ class TrafficLightViewModel: ObservableObject {
     @Published var isIterating = false
     
     let allStates = TrafficLightState.allCases
+    let carModel: String
     
+    private unowned let coordinator: TrafficLightCoordinatorViewModel
     private let manager = TrafficLightManager()
+    
+    init(coordinator: TrafficLightCoordinatorViewModel, carModel: String) {
+        self.coordinator = coordinator
+        self.carModel = carModel
+    }
     
 }
 

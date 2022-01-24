@@ -9,52 +9,55 @@ import SwiftUI
 
 struct CarModelView: View {
     
-    @StateObject private var viewModel = CarModelViewModel()
+    @EnvironmentObject var coordinator: TrafficLightCoordinatorViewModel
+    @StateObject private var viewModel: CarModelViewModel
+    
+    init(viewModel: CarModelViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
-        NavigationView {
-            Group {
-                VStack(spacing: 60) {
-                    VStack(alignment: .leading) {
-                        Text("Which car model are you driving on ?")
-                        
-                        TextField("Citroen C3", text: $viewModel.carModel)
-                            .padding(4)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.gray, lineWidth: 0.5)
-                            )
-                        
-                        if viewModel.shouldShowError {
-                            Text("Please enter you car model")
-                                .foregroundColor(Color.red)
-                                .font(.callout)
-                        }
-                    }
-                    .animation(.easeInOut, value: viewModel.shouldShowError)
+        Group {
+            VStack(spacing: 60) {
+                VStack(alignment: .leading) {
+                    Text("Which car model are you driving on ?")
                     
-                    Button {
-                        viewModel.didTapStartDrivingButton()
-                    } label: {
-                        Text("Start driving")
-                            .foregroundColor(Color.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Capsule())
+                    TextField("Citroen C3", text: $viewModel.carModel)
+                        .padding(4)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.gray, lineWidth: 0.5)
+                        )
+                    
+                    if viewModel.shouldShowError {
+                        Text("Please enter you car model")
+                            .foregroundColor(Color.red)
+                            .font(.callout)
                     }
                 }
+                .animation(.easeInOut, value: viewModel.shouldShowError)
                 
-                NavigationLink(destination: TrafficLightView(carModel: viewModel.carModel), isActive: $viewModel.pushTrafficLightView)
+                Button {
+                    viewModel.didTapStartDrivingButton()
+                } label: {
+                    Text("Start driving")
+                        .foregroundColor(Color.white)
+                        .padding()
+                        .background(Color.blue)
+                        .clipShape(Capsule())
+                }
             }
-            .padding()
-            .navigationBarHidden(true)
-            .navigationBarTitleDisplayMode(.inline)
+            
+            NavigationLink(destination: coordinator.trafficLightView, isActive: $coordinator.pushTrafficLight)
         }
+        .padding()
     }
 }
 
 struct ModelCarView_Previews: PreviewProvider {
     static var previews: some View {
-        CarModelView()
+        let coordinatorViewModel = TrafficLightCoordinatorViewModel()
+        let carViewModel = CarModelViewModel(coordinator: coordinatorViewModel)
+        CarModelView(viewModel: carViewModel)
     }
 }
