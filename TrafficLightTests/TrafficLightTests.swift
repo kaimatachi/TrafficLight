@@ -1,6 +1,6 @@
 //
-//  TrafficLightTests.swift
-//  TrafficLightTests
+//  TrafficLightManagerTests.swift
+//  TrafficLightManagerTests
 //
 //  Created by Jeremy Van Cauteren on 19/01/2022.
 //
@@ -8,29 +8,47 @@
 import XCTest
 @testable import TrafficLight
 
-class TrafficLightTests: XCTestCase {
+class TrafficLightManagerTests: XCTestCase {
+    
+    let firstState = TrafficLightState.red
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+    func testFirstIteration() throws {
+        let manager = TrafficLightManager()
+        manager.startIterating()
+        
+        let exp = expectation(description: "Test after X seconds")
+        _ = XCTWaiter.wait(for: [exp], timeout: firstState.timeToNextCase)
+        
+        XCTAssert(firstState.nextState == manager.state.value, "Wrong state encountered")
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    func testSecondIteration() throws {
+        let manager = TrafficLightManager()
+        manager.startIterating()
+        
+        let exp = expectation(description: "Test after X seconds")
+        _ = XCTWaiter.wait(for: [exp], timeout: firstState.timeToNextCase + firstState.nextState.timeToNextCase)
+        
+        XCTAssert(firstState.nextState.nextState == manager.state.value, "Wrong state encountered")
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    
+    func testStopIterating() {
+        let manager = TrafficLightManager()
+        manager.startIterating()
+        
+        let exp = expectation(description: "Test after X seconds")
+        _ = XCTWaiter.wait(for: [exp], timeout: firstState.timeToNextCase)
+        
+        manager.stopIterating()
+        
+        XCTAssert(firstState.nextState == manager.state.value, "Wrong state encountered")
+        
+        let exp2 = expectation(description: "Test after X seconds")
+        _ = XCTWaiter.wait(for: [exp2], timeout: firstState.nextState.timeToNextCase)
+        
+        XCTAssert(firstState.nextState == manager.state.value, "Wrong state encountered")
+        
     }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
+    
 }
